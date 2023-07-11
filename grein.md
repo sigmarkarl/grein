@@ -1,5 +1,5 @@
 ---
-title: "Geneset: Pan genome and synteny analysis of bacteria"
+title: "Geneset: Pangenomic and synteny analysis of Thermus species"
 date: "01-01-2023"
 jupytext:
   text_representation:
@@ -8,7 +8,12 @@ jupytext:
     format_version: 0.13
     jupytext_version: 1.14.5
 exports:
+  - format: tex
+    output: grein.tex
+  - format: pdf
+    output: grein.pdf
   - format: docx
+    output: grein.docx
 ---
 
 ### Abstract
@@ -17,7 +22,7 @@ exports:
 
 **Results**: We present Geneset, a desktop application written in Java providing algorithms and advanced visualization for comparative and pan-genomics. It analyses synteny and structural patterns using pan-genome graphs. The software is built upon Apache Spark cloud computing environment and is scalable as such. Geneset uses a suite of external open source command line tools.
 
-**Conclusions**: Although possible to be run in a headless mode as part of a workflow/pipeline or as a database accessible from a Spark context, the Geneset software suite offers a rich UI and unprecedented graphics capabilities. The interactive mode manual curation of results easier.
+**Conclusions**: Although possible to be run in a headless mode as part of a workflow/pipeline or as a database accessible from a Spark context, the Geneset software suite offers a rich UI and unprecedented graphics capabilities, such as visualization of synteny using colors, genome atlases and phylogeny comparisons. The program offers automatic reordering of contigs. The interactive mode manual curation of results easier. We show that the difference in genomic features in Thermus are responsible for divergence and different adaptations.
 
 **Keywords**: pangenomics, microbial genomics, whole genome sequencing, bioinformatics
 
@@ -52,8 +57,20 @@ To prepare for comparative analysis of the genomes in the project, the first ste
 #### MSA
 The main Geneset table has now been reduced (from around 200000 gene entries to 8500 gene families in a project using 100 Thermus strains). Each row now represents a set of homologus genes. The next step is to run multiple sequence alignment (MSA) on all the groups. For this we use the [MAFFT](https://doi.org/10.1093/nar/gkf436) multiple alignment software. Again a Spark dataset is created, now with all the protein sequences in a group. The map step produces a fasta format that is fed into the [MAFFT](https://doi.org/10.1093/nar/gkf436) algorithm. The resulting MSA fasta is saved into the project zip file (under the 'alignment' folder). Optional: HMMER Sequence profiles can be generated from all the gene groups if the user wants to use profile queries against the project data. The HMMER files are stored in the 'hmmer' folder.
 
-#### Synteny analysis
-Each group of genes is stored as a node in a graph using Spark‘s GraphX capabilities. The edges are all possible paths to another set of genes within the project. The graph is undirected but each edge is annotated as a forward or backward edge depending on the direction of the gene. The direction annotations are only used for island identification and node collapsing. Once the genes in an islands have been joined in a single node, the graph can be treated as any other. The island identification is an iterative process. First all homologus genes with a single shared edge in the same direction are joined. Then, allowing for slight variations, four kinds of graph motifs are joined. A. replacements, B. inserts, C. flip and D. mixed. The reason for not treating every motif as D is that the motifs indicate different behavior in the genome. The images show the general pattern though the motifs can have any number of center nodes. For instance, motif A could be a single triangle.
+#### Synteny cluster detection
+Synteny in biology refers to the conservation of gene order and arrangement across different species or within a species. There are several reasons for the existence of synteny in biology:
+
+*Evolutionary Conservation*: Synteny is often the result of evolutionary processes that conserve the organization of genes over time. It indicates that certain gene arrangements have been advantageous and maintained through natural selection because they contribute to the fitness or survival of the organism.
+
+*Functional Relationships*: Synteny can reflect functional relationships between genes. Genes located close to each other on a chromosome may have co-evolved and become functionally linked. This can occur when genes participate in the same biological pathway or are involved in coordinating specific cellular processes.
+
+*Gene Regulation*: Synteny can play a role in gene regulation. Regulatory elements that control gene expression, such as enhancers or silencers, may be located in close proximity to the genes they regulate. By maintaining synteny, the regulatory elements can be conserved along with the genes, ensuring proper gene expression patterns.
+
+*Chromosomal Rearrangements*: Synteny can be disrupted by chromosomal rearrangements, such as inversions, translocations, or duplications. However, the presence of synteny despite occasional rearrangements suggests that these rearrangements are relatively rare or have been counterbalanced by selection pressures, indicating the importance of maintaining gene order.
+
+Comparative Genomics: Synteny is a valuable tool in comparative genomics. By comparing the gene order and organization across different species, researchers can infer evolutionary relationships, identify conserved regions, and gain insights into genome evolution. Synteny maps can aid in genome assembly, gene annotation, and the discovery of genetic variations associated with diseases.
+
+Overall, the presence of synteny in biology can provide insights into the evolutionary history, functional relationships, and regulatory mechanisms of genes, and it serves as a valuable tool in comparative genomics. Each group of genes is stored as a node in a graph using Spark‘s GraphX capabilities. The edges are all possible paths to another set of genes within the project. The graph is undirected but each edge is annotated as a forward or backward edge depending on the direction of the gene. The direction annotations are only used for island identification and node collapsing. Once the genes in an islands have been joined in a single node, the graph can be treated as any other. The island identification is an iterative process. First all homologus genes with a single shared edge in the same direction are joined. Then, allowing for slight variations, four kinds of graph motifs are joined. A. replacements, B. inserts, C. flip and D. mixed. The reason for not treating every motif as D is that the motifs indicate different behavior in the genome. The images show the general pattern though the motifs can have any number of center nodes. For instance, motif A could be a single triangle.
 
 ![islands](islands.pdf "islands")
  
@@ -137,7 +154,7 @@ Maven coordinates: org.simmi.geneset:distann:1.0.0
 
 Programming language: Java
 
-Other requirements: Blast/Diamond, Mafft, fasttree
+Other requirements: Blast/Diamond, Mafft, fasttree, prodigal
 
 License: MIT
 
